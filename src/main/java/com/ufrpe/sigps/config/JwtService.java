@@ -1,15 +1,14 @@
 package com.ufrpe.sigps.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +17,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // A chave secreta será injetada a partir das propriedades da aplicação (application.properties/yml)
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
     @Value("${application.security.jwt.expiration}")
-    private long jwtExpiration; // Tempo de expiração do token em milissegundos
+    private long jwtExpiration; // milissegundos
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -38,22 +36,20 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
-        // Adicionar o tipo de role como um claim
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         if (userDetails instanceof com.ufrpe.sigps.model.User) {
             extraClaims.put("role", ((com.ufrpe.sigps.model.User) userDetails).getRole().name());
         }
 
-        return Jwts
-                .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) // O email do usuário é o "subject"
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+        Instant now = Instant.now();
+        SecretKey key = getSignInKey(); // SecretKey correto
+
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(jwtExpiration)))
+                .signWith(key, Jwts.SIG.HS256) // método novo correto
                 .compact();
     }
 
@@ -71,15 +67,22 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser() // Mudança aqui: de parserBuilder() para parser()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            SecretKey key = getSignInKey();
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (JwtException e) {
+            // Aqui você pode lançar uma exceção customizada ou logar
+            throw new RuntimeException("Token inválido ou expirado", e);
+        }
     }
 
-    private Key getSignInKey() {
+
+    private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(keyBytes); // retorna SecretKey
     }
 }
