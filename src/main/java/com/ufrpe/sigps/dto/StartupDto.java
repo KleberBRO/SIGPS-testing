@@ -16,8 +16,8 @@ import java.util.List;
 @Builder
 public class StartupDto {
     private Long id;
-    @NotBlank(message = "CNPJ ou identificador é obrigatório")
-    private String cnpjOrIdentifier;
+    @NotBlank(message = "CNPJ é obrigatório")
+    private String cnpj;
     @NotBlank(message = "Nome da startup é obrigatório")
     private String name;
     private String description;

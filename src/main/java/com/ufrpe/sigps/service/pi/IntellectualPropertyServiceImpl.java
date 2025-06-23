@@ -134,7 +134,7 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                                 GeographicIndicationDto giDto = (GeographicIndicationDto) piDto;
 
                                 existingGI.setGeographicName(giDto.getGeographicName());
-                                existingGI.setProductOrService(giDto.getProductOrService());
+                                existingGI.setProduct(giDto.getProduct());
                                 existingGI.setAreaDelimitation(giDto.getAreaDelimitation());
                                 existingGI.setIgNature(giDto.getIgNature());
                                 existingGI.setVisualRepresentationUrl(giDto.getVisualRepresentationUrl());
@@ -306,7 +306,7 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                 GeographicIndicationDto giDto = (GeographicIndicationDto) dto;
                 intellectualProperty = GeographicIndication.builder()
                         .geographicName(giDto.getGeographicName())
-                        .productOrService(giDto.getProductOrService())
+                        .product(giDto.getProduct())
                         .areaDelimitation(giDto.getAreaDelimitation())
                         .igNature(giDto.getIgNature())
                         .visualRepresentationUrl(giDto.getVisualRepresentationUrl())
@@ -436,7 +436,7 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                 GeographicIndication giEntity = (GeographicIndication) entity;
                 dto = GeographicIndicationDto.builder()
                         .geographicName(giEntity.getGeographicName())
-                        .productOrService(giEntity.getProductOrService())
+                        .product(giEntity.getProduct())
                         .areaDelimitation(giEntity.getAreaDelimitation())
                         .igNature(giEntity.getIgNature())
                         .visualRepresentationUrl(giEntity.getVisualRepresentationUrl())

@@ -21,8 +21,8 @@ public class Startup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cnpj_or_identifier", nullable = false, unique = true)
-    private String cnpjOrIdentifier;
+    @Column(name = "cnpj", nullable = false, unique = true)
+    private String cnpj;
 
     @Column(nullable = false)
     private String name;

@@ -20,8 +20,8 @@ public class GeographicIndication extends IntellectualProperty {
     @Column(name = "geographic_name", nullable = false)
     private String geographicName;
 
-    @Column(name = "product_or_service", nullable = false)
-    private String productOrService;
+    @Column(name = "product", nullable = false)
+    private String product;
 
     @Column(name = "area_delimitation", columnDefinition = "TEXT", nullable = false)
     private String areaDelimitation;

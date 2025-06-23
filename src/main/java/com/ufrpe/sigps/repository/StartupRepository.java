@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.List;
 
 public interface StartupRepository extends JpaRepository<Startup, Long> {
-    Optional<Startup> findByCnpjOrIdentifier(String cnpjOrIdentifier); // Encontra uma startup pelo CNPJ/identificador
+    Optional<Startup> findByCnpj(String cnpj); // Encontra uma startup pelo CNPJ
     List<Startup> findByNameContainingIgnoreCase(String name); // Encontra startups por nome (parcial e ignorando caixa)
     List<Startup> findByStatus(String status); // Encontra startups por status
 }

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface GeographicIndicationRepository extends JpaRepository<GeographicIndication, Long> {
     List<GeographicIndication> findByGeographicNameContainingIgnoreCase(String geographicName);
-    List<GeographicIndication> findByProductOrService(String productOrService);
+    List<GeographicIndication> findByProduct(String product);
 }

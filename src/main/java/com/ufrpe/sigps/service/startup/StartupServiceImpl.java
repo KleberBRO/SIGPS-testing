@@ -57,7 +57,7 @@ public class StartupServiceImpl implements StartupService {
                 .map(existingStartup -> {
                     // Atualiza os campos da entidade existente com os dados do DTO
                     // Não alteramos o ID, pois ele já existe
-                    existingStartup.setCnpjOrIdentifier(startupDto.getCnpjOrIdentifier());
+                    existingStartup.setCnpj(startupDto.getCnpj());
                     existingStartup.setName(startupDto.getName());
                     existingStartup.setDescription(startupDto.getDescription());
                     existingStartup.setCreationDate(startupDto.getCreationDate());
@@ -91,7 +91,7 @@ public class StartupServiceImpl implements StartupService {
         }
         return StartupDto.builder()
                 .id(startup.getId())
-                .cnpjOrIdentifier(startup.getCnpjOrIdentifier())
+                .cnpj(startup.getCnpj())
                 .name(startup.getName())
                 .description(startup.getDescription())
                 .creationDate(startup.getCreationDate())
@@ -107,7 +107,7 @@ public class StartupServiceImpl implements StartupService {
         }
         return Startup.builder()
                 .id(startupDto.getId()) // ID pode ser nulo para novas entidades (gerado pelo DB)
-                .cnpjOrIdentifier(startupDto.getCnpjOrIdentifier())
+                .cnpj(startupDto.getCnpj())
                 .name(startupDto.getName())
                 .description(startupDto.getDescription())
                 .creationDate(startupDto.getCreationDate())
