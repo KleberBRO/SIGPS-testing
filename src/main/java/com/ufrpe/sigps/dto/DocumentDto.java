@@ -18,7 +18,4 @@ public class DocumentDto {
     private String type;
     @NotBlank(message = "Caminho do arquivo é obrigatório")
     private String filePath;
-    // Não incluir IDs de PI/Startup aqui se for DTO de retorno, para evitar ciclos
-    // ou se o documento for enviado em um contexto específico.
-    // Se for para criação, pode ter Long intellectualPropertyId; Long startupId;
 }

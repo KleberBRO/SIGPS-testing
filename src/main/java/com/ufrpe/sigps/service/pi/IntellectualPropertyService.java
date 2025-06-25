@@ -11,6 +11,5 @@ public interface IntellectualPropertyService {
     List<IntellectualPropertyDto> getAllIntellectualProperties();
     IntellectualPropertyDto updateIntellectualProperty(Long id, IntellectualPropertyDto piDto);
     void deleteIntellectualProperty(Long id);
-    // Você pode adicionar mais métodos aqui conforme a necessidade
-    // Ex: List<IntellectualPropertyDto> findByInventorId(Long inventorId);
+
 }

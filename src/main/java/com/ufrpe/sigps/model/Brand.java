@@ -24,9 +24,9 @@ public class Brand extends IntellectualProperty {
     private BrandType brandType;
 
     @Column(name = "brand_name")
-    private String brandName; // Se aplicável (nominativa, mista)
+    private String brandName;
 
-    @Column(name = "image_url") // Caminho para a imagem (se figurativa, mista, tridimensional)
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Column(name = "nice_classification_code", nullable = false)
@@ -35,12 +35,12 @@ public class Brand extends IntellectualProperty {
     @Column(name = "activity_description", columnDefinition = "TEXT", nullable = false)
     private String activityDescription;
 
-    @Column(name = "request_nature", nullable = false) // Marca nova ou com prioridade unionista
+    @Column(name = "request_nature", nullable = false)
     private String requestNature;
 
-    @Column(name = "usage_status", nullable = false) // Já em uso ou futuro
+    @Column(name = "usage_status", nullable = false)
     private String usageStatus;
 
     @Column(name = "start_usage_date")
-    private LocalDate startUsageDate; // Opcional
+    private LocalDate startUsageDate;
 }

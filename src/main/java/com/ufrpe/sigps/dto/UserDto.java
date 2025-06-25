@@ -13,9 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @SuperBuilder
 public class UserDto {
+
     private Long id;
     private String name;
-    private LocalDate dateOfBirth;
+    private LocalDate dateBirth;
     private String email;
     private String cpf;
     private String nationality;

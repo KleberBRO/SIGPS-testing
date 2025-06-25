@@ -1,6 +1,7 @@
 package com.ufrpe.sigps.dto;
 
 import jakarta.validation.constraints.*;
+import com.ufrpe.sigps.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,14 +19,14 @@ public class RegisterRequest {
 
     @NotNull(message = "Data de nascimento é obrigatória")
     @Past(message = "Data de nascimento deve ser no passado")
-    private LocalDate dateOfBirth;
+    private LocalDate dateBirth;
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Formato de email inválido")
     private String email;
 
     @NotBlank(message = "CPF é obrigatório")
-    @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos") // Considerar validação de CPF mais robusta
+    @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos") //melhorar
     private String cpf;
 
     @NotBlank(message = "Nacionalidade é obrigatória")

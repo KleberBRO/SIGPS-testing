@@ -21,7 +21,7 @@ public class JwtService {
     private String secretKey;
 
     @Value("${application.security.jwt.expiration}")
-    private long jwtExpiration; // milissegundos
+    private long jwtExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -42,14 +42,14 @@ public class JwtService {
         }
 
         Instant now = Instant.now();
-        SecretKey key = getSignInKey(); // SecretKey correto
+        SecretKey key = getSignInKey();
 
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(jwtExpiration)))
-                .signWith(key, Jwts.SIG.HS256) // método novo correto
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -75,7 +75,6 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException e) {
-            // Aqui você pode lançar uma exceção customizada ou logar
             throw new RuntimeException("Token inválido ou expirado", e);
         }
     }

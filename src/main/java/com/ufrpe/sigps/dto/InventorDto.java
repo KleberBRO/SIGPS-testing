@@ -16,6 +16,5 @@ public class InventorDto extends UserDto {
     private String course;
     private String department;
 
-    // Opcional: List<IntellectualPropertyDto> intellectualProperties;
-    // Cuidado com a recursão se incluir PIs aqui. Pode ser melhor ter um endpoint separado.
+    //List<IntellectualPropertyDto> intellectualProperties
 }

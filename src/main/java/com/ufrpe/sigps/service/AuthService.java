@@ -22,13 +22,12 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final InventorRepository inventorRepository; // Injetar InventorRepository
+    private final InventorRepository inventorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
-        // Validação inicial (algumas validações já estão no DTO com @Valid)
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email já cadastrado.");
         }
@@ -36,31 +35,27 @@ public class AuthService {
             throw new IllegalArgumentException("CPF já cadastrado.");
         }
 
-        // Por padrão, novos registros são Inventores
         var inventor = Inventor.builder()
                 .name(request.getName())
-                .dateOfBirth(request.getDateOfBirth())
+                .dateBirth(request.getDateBirth())
                 .email(request.getEmail())
                 .cpf(request.getCpf())
                 .nationality(request.getNationality())
                 .address(request.getAddress())
-                .password(passwordEncoder.encode(request.getPassword())) // Criptografa a senha
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.INVENTOR)
-                // Para simplificar o registro inicial de inventor, defina valores padrão ou nulos
-                // para 'course' e 'department'. Estes podem ser atualizados posteriormente.
-                .course("A definir") // Valor padrão
-                .department("A definir") // Valor padrão
+                .course("Valor padrão")
+                .department("Valor padrão")
                 .build();
 
-        inventorRepository.save(inventor); // Salva o inventor no banco de dados
+        inventorRepository.save(inventor);
 
-        // Gera o token JWT para o novo usuário registrado
-        var jwtToken = jwtService.generateToken(inventor); // inventor é um UserDetails
+        //gera um token
+        var jwtToken = jwtService.generateToken(inventor);
         return AuthResponse.builder().token(jwtToken).build();
     }
 
     public AuthResponse authenticate(LoginRequest request) {
-        // Tenta autenticar o usuário com as credenciais fornecidas
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -71,7 +66,7 @@ public class AuthService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o email: " + request.getEmail()));
 
-        var jwtToken = jwtService.generateToken(user); // user é um UserDetails
+        var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder().token(jwtToken).build();
     }
 }

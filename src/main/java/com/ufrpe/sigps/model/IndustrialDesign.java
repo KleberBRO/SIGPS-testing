@@ -32,5 +32,5 @@ public class IndustrialDesign extends IntellectualProperty {
     private String applicationField;
 
     @Column(name = "unionist_priority")
-    private Boolean unionistPriority; // Se aplicável
+    private Boolean unionistPriority;
 }

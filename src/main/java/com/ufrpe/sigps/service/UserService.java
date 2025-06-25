@@ -28,38 +28,32 @@ public class UserService {
     private final AdministratorRepository administratorRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Método para buscar todos os usuários (útil para administradores)
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::convertToDto) // Converte cada User para UserDto ou subclasse
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    // Método para buscar um usuário pelo ID
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
         return convertToDto(user);
     }
 
-    // Método para atualizar informações de um usuário (pode ser tanto Inventor quanto Admin)
     public UserDto updateUserDetails(Long id, UserDto userDto) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
 
-        // Atualiza campos comuns
         existingUser.setName(userDto.getName());
-        existingUser.setDateOfBirth(userDto.getDateOfBirth());
+        existingUser.setDateBirth(userDto.getDateBirth());
         existingUser.setAddress(userDto.getAddress());
         existingUser.setNationality(userDto.getNationality());
-        // Email e CPF geralmente não são alterados, mas podem ser adicionadas regras específicas se for permitido.
-        // Se a senha for alterada, deve ser feito em um endpoint separado e com validação.
+        // Email e CPF geralmente não são alterados
 
         User updatedUser = userRepository.save(existingUser);
         return convertToDto(updatedUser);
     }
 
-    // Método para alterar a senha do usuário
     public void changePassword(Long userId, String newPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + userId));
@@ -67,14 +61,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Método para converter Entidade User (ou subclasses) para DTO (ou subclasses)
     private UserDto convertToDto(User user) {
-        if (user instanceof Inventor) {
-            Inventor inventor = (Inventor) user;
+        if (user instanceof Inventor inventor) {
             return InventorDto.builder()
                     .id(inventor.getId())
                     .name(inventor.getName())
-                    .dateOfBirth(inventor.getDateOfBirth())
+                    .dateBirth(inventor.getDateBirth())
                     .email(inventor.getEmail())
                     .cpf(inventor.getCpf())
                     .nationality(inventor.getNationality())
@@ -83,12 +75,11 @@ public class UserService {
                     .course(inventor.getCourse())
                     .department(inventor.getDepartment())
                     .build();
-        } else if (user instanceof Administrator) {
-            Administrator admin = (Administrator) user;
+        } else if (user instanceof Administrator admin) {
             return AdministratorDto.builder()
                     .id(admin.getId())
                     .name(admin.getName())
-                    .dateOfBirth(admin.getDateOfBirth())
+                    .dateBirth(admin.getDateBirth())
                     .email(admin.getEmail())
                     .cpf(admin.getCpf())
                     .nationality(admin.getNationality())
@@ -96,11 +87,10 @@ public class UserService {
                     .role(admin.getRole())
                     .build();
         } else {
-            // Caso seja um User genérico (o que não deve acontecer com a herança JOINED e DiscriminatorColumn)
             return UserDto.builder()
                     .id(user.getId())
                     .name(user.getName())
-                    .dateOfBirth(user.getDateOfBirth())
+                    .dateBirth(user.getDateBirth())
                     .email(user.getEmail())
                     .cpf(user.getCpf())
                     .nationality(user.getNationality())
@@ -110,9 +100,6 @@ public class UserService {
         }
     }
 
-    // --- Métodos específicos para Administradores (cadastro/remoção de inventores) ---
-
-    // Cadastrar novo inventor (funcionalidade do ADM)
     public InventorDto registerInventorByAdmin(RegisterRequest request, String course, String department) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email já cadastrado.");
@@ -123,13 +110,13 @@ public class UserService {
 
         var inventor = Inventor.builder()
                 .name(request.getName())
-                .dateOfBirth(request.getDateOfBirth())
+                .dateBirth(request.getDateBirth())
                 .email(request.getEmail())
                 .cpf(request.getCpf())
                 .nationality(request.getNationality())
                 .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.INVENTOR) // Sempre registra como INVENTOR
+                .role(Role.INVENTOR)
                 .course(course)
                 .department(department)
                 .build();
@@ -138,7 +125,6 @@ public class UserService {
         return (InventorDto) convertToDto(savedInventor);
     }
 
-    // Remover usuário (apenas para Administradores)
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuário não encontrado com o ID: " + id);

@@ -24,23 +24,23 @@ public class Patent extends IntellectualProperty {
     private PatentType patentType;
 
     @Column(name = "international_classification", nullable = false)
-    private String internationalClassification; // IPC
+    private String internationalClassification;
 
     @Column(name = "technical_application_field", nullable = false)
     private String technicalApplicationField;
 
     @Column(name = "filing_date", nullable = false)
-    private LocalDate filingDate; // Data de depósito
+    private LocalDate filingDate;
 
     @Column(name = "priority_date")
-    private LocalDate priorityDate; // Se houver
+    private LocalDate priorityDate;
 
     @Column(name = "priority_country")
-    private String priorityCountry; // Se houver
+    private String priorityCountry;
 
     @Column(name = "priority_number")
-    private String priorityNumber; // Se houver
+    private String priorityNumber;
 
     @Column(name = "previous_request_related")
-    private Boolean previousRequestRelated; // Se existe pedido anterior relacionado
+    private Boolean previousRequestRelated;
 }

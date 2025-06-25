@@ -34,17 +34,17 @@ public class Startup {
     private LocalDate creationDate;
 
     @Column(nullable = false)
-    private String status; // Ex: "Ativa", "Incubada", "Graduada"
+    private String status;
 
     @Column(name = "academic_project_link")
-    private String academicProjectLink; // Vinculação a projetos acadêmicos (URL ou identificador)
+    private String academicProjectLink;
 
     @Column(name = "research_group_link")
-    private String researchGroupLink; // Vinculação a grupos de pesquisa (URL ou identificador)
+    private String researchGroupLink;
 
     @OneToMany(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IntellectualProperty> intellectualProperties; // Uma startup pode ter várias PIs vinculadas
+    private List<IntellectualProperty> intellectualProperties;
 
     @OneToMany(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Document> documents; // Documentos associados à startup
+    private List<Document> documents;
 }

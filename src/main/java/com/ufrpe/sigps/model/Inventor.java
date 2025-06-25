@@ -13,18 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true) // Inclui campos da superclasse no equals e hashCode
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "inventor")
-@DiscriminatorValue("INVENTOR") // Valor para a coluna 'user_type'
+@DiscriminatorValue("INVENTOR")
 public class Inventor extends User {
 
     @Column(nullable = false)
-    private String course; // Curso ao qual pertence (se for aluno ou professor/técnico vinculado a um curso)
+    private String course;
 
     @Column(nullable = false)
-    private String department; // Departamento ao qual pertence
+    private String department;
 
     @OneToMany(mappedBy = "inventor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IntellectualProperty> intellectualProperties; // Um inventor pode ter várias PIs
+    private List<IntellectualProperty> intellectualProperties;
 }

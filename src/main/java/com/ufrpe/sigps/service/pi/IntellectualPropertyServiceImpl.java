@@ -35,17 +35,14 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
 
     @Override
     public IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto) {
-        // Converte o DTO genérico (ou de subclasse) para a entidade correta
         IntellectualProperty pi = convertDtoToEntity(piDto);
         IntellectualProperty savedPI = intellectualPropertyRepository.save(pi);
-        // Converte a entidade salva de volta para o DTO apropriado (subclasse de DTO)
         return convertEntityToDto(savedPI);
     }
 
     @Override
     public IntellectualPropertyDto getIntellectualPropertyById(Long id) {
         return intellectualPropertyRepository.findById(id)
-                // A linha abaixo foi ajustada para garantir a inferência de tipo
                 .map(this::convertEntityToDto)
                 .orElseThrow(() -> new EntityNotFoundException("Propriedade Intelectual com ID " + id + " não encontrada."));
     }
@@ -54,7 +51,6 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
     public List<IntellectualPropertyDto> getAllIntellectualProperties() {
         List<IntellectualProperty> ips = intellectualPropertyRepository.findAll();
         return ips.stream()
-                // A linha abaixo foi ajustada para garantir a inferência de tipo
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -63,12 +59,9 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
     public IntellectualPropertyDto updateIntellectualProperty(Long id, IntellectualPropertyDto piDto) {
         return intellectualPropertyRepository.findById(id)
                 .map(existingPI -> {
-                    // Verificação de tipo: Garantir que o tipo do DTO corresponde ao tipo da entidade existente
                     if (!existingPI.getType().equals(piDto.getType())) {
                         throw new IllegalArgumentException("Não é permitido mudar o tipo de uma Propriedade Intelectual existente.");
                     }
-
-                    // Atualiza campos da classe base (IntellectualProperty)
                     existingPI.setTitle(piDto.getTitle());
                     existingPI.setDescription(piDto.getDescription());
                     existingPI.setStatus(piDto.getStatus());
@@ -77,12 +70,10 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     existingPI.setExpirationDate(piDto.getExpirationDate());
                     existingPI.setProcessingStage(piDto.getProcessingStage());
 
-                    // Lógica para atualização de campos específicos da subclasse
-                    // Isso exige um 'instanceof' e um cast para cada tipo específico
                     switch (piDto.getType()) {
                         case SOFTWARE -> {
                             if (existingPI instanceof Software existingSoftware) {
-                                SoftwareDto softwareDto = (SoftwareDto) piDto; // Cast seguro após verificação de tipo
+                                SoftwareDto softwareDto = (SoftwareDto) piDto;
 
                                 existingSoftware.setHolderName(softwareDto.getHolderName());
                                 existingSoftware.setHolderAddress(softwareDto.getHolderAddress());
@@ -167,16 +158,15 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                         }
                         default -> {
                         }
-                        // Não há campos específicos para outros tipos ou um tipo desconhecido
                     }
 
-                    // Atualização de relacionamentos (Inventor e Startup)
+
                     if (piDto.getInventorId() != null) {
                         Inventor inventor = inventorRepository.findById(piDto.getInventorId())
                                 .orElseThrow(() -> new EntityNotFoundException("Inventor com ID " + piDto.getInventorId() + " não encontrado."));
                         existingPI.setInventor(inventor);
                     } else {
-                        // Se inventorId for null no DTO, mas a PI precisa de um inventor, pode ser um erro
+
                         throw new IllegalArgumentException("O inventor é obrigatório para Propriedade Intelectual.");
                     }
 
@@ -185,18 +175,10 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                                 .orElseThrow(() -> new EntityNotFoundException("Startup com ID " + piDto.getStartupId() + " não encontrada."));
                         existingPI.setStartup(startup);
                     } else {
-                        existingPI.setStartup(null); // Se o ID da startup for nulo no DTO, desvincula
+                        existingPI.setStartup(null);
                     }
 
-                    // ATENÇÃO: A atualização de coleções (como 'documents') é mais complexa
-                    // e geralmente exige uma lógica separada para adicionar/remover/atualizar itens.
-                    // Para este exemplo, a lista de documentos NÃO ESTÁ sendo atualizada diretamente
-                    // através do DTO da PI para evitar complexidade indevida aqui.
-                    // Se precisar gerenciar documentos junto com a PI, recomendo um serviço de documento
-                    // ou métodos dedicados para adicionar/remover documentos.
-
                     IntellectualProperty updatedPI = intellectualPropertyRepository.save(existingPI);
-                    // A linha abaixo foi ajustada para garantir a inferência de tipo
                     return convertEntityToDto(updatedPI);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Propriedade Intelectual com ID " + id + " não encontrada para atualização."));
@@ -210,17 +192,8 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         intellectualPropertyRepository.deleteById(id);
     }
 
-    /**
-     * Converte um DTO de Propriedade Intelectual para a entidade JPA correspondente.
-     * Este método é crucial para lidar com a hierarquia de herança.
-     *
-     * @param dto O DTO de entrada (pode ser IntellectualPropertyDto ou suas subclasses).
-     * @return A entidade concreta de Propriedade Intelectual.
-     * @throws IllegalArgumentException se o tipo de PI for inválido ou ausente.
-     * @throws EntityNotFoundException se o Inventor ou Startup referenciados não forem encontrados.
-     */
     private IntellectualProperty convertDtoToEntity(IntellectualPropertyDto dto) {
-        // Busca as entidades relacionadas (Inventor, Startup)
+
         Inventor inventor = inventorRepository.findById(dto.getInventorId())
                 .orElseThrow(() -> new EntityNotFoundException("Inventor com ID " + dto.getInventorId() + " não encontrado."));
 
@@ -230,34 +203,28 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     .orElseThrow(() -> new EntityNotFoundException("Startup com ID " + dto.getStartupId() + " não encontrada."));
         }
 
-        // Converte a lista de DocumentDto para Document (entidade)
-        // Atenção: Documentos precisam ter o campo 'intellectualProperty' setado APÓS a criação da PI
-        // para manter a relação bidirecional. Por isso, a lista é construída aqui,
-        // mas a associação inversa será feita depois.
         List<Document> documents = null;
         if (dto.getDocuments() != null && !dto.getDocuments().isEmpty()) {
             documents = dto.getDocuments().stream()
                     .map(docDto -> Document.builder()
-                            .id(docDto.getId()) // Pode ser nulo para novos documentos
+                            .id(docDto.getId())
                             .title(docDto.getTitle())
                             .type(docDto.getType())
                             .filePath(docDto.getFilePath())
-                            // .intellectualProperty(null) // Será setado após a criação da PI
-                            // .startup(null) // Se o documento não for de startup, mantém nulo
+                            // .intellectualProperty(null) - Será setado após a criação da PI
+                            // .startup(null) - Se o documento não for de startup, mantém nulo
                             .build())
                     .collect(Collectors.toList());
         }
 
         IntellectualProperty intellectualProperty;
 
-        // --- AQUI É O PONTO CHAVE: Instanciando a subclasse concreta baseada no tipo ---
         if (dto.getType() == null) {
             throw new IllegalArgumentException("O tipo da Propriedade Intelectual (pi_type) é obrigatório.");
         }
-
         switch (dto.getType()) {
             case SOFTWARE -> {
-                SoftwareDto softwareDto = (SoftwareDto) dto; // Cast para o DTO de subclasse
+                SoftwareDto softwareDto = (SoftwareDto) dto;
                 intellectualProperty = Software.builder()
                         .holderName(softwareDto.getHolderName())
                         .holderAddress(softwareDto.getHolderAddress())
@@ -339,10 +306,10 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     throw new IllegalArgumentException("Tipo de Propriedade Intelectual ('" + dto.getType() + "') não reconhecido ou inválido.");
         }
 
-        // --- Copia os campos da classe base (IntellectualPropertyDto) para a entidade construída ---
+        intellectualProperty.setId(dto.getId());
         intellectualProperty.setTitle(dto.getTitle());
         intellectualProperty.setDescription(dto.getDescription());
-        intellectualProperty.setType(dto.getType()); // Tipo já foi usado para o switch, mas bom setar
+        intellectualProperty.setType(dto.getType());
         intellectualProperty.setStatus(dto.getStatus());
         intellectualProperty.setRequestDate(dto.getRequestDate());
         intellectualProperty.setGrantDate(dto.getGrantDate());
@@ -351,24 +318,16 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         intellectualProperty.setInventor(inventor);
         intellectualProperty.setStartup(startup);
 
-        // Associa a PI aos documentos. Isso é crucial para o @OneToMany bidirecional
         if (documents != null) {
             for (Document doc : documents) {
                 doc.setIntellectualProperty(intellectualProperty);
             }
         }
-        intellectualProperty.setDocuments(documents); // Adiciona os documentos à PI
+        intellectualProperty.setDocuments(documents);
 
         return intellectualProperty;
     }
 
-    /**
-     * Converte uma entidade JPA de Propriedade Intelectual para o DTO de subclasse correspondente.
-     * Este método é crucial para lidar com a hierarquia de herança na saída.
-     *
-     * @param entity A entidade de Propriedade Intelectual.
-     * @return O DTO de subclasse de Propriedade Intelectual.
-     */
     private IntellectualPropertyDto convertEntityToDto(IntellectualProperty entity) {
         List<DocumentDto> documentDtos = null;
         if (entity.getDocuments() != null && !entity.getDocuments().isEmpty()) {
@@ -384,10 +343,9 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
 
         IntellectualPropertyDto dto;
 
-        // Instancia o DTO da subclasse correta e copia os campos específicos
         switch (entity.getType()) {
             case SOFTWARE -> {
-                Software softwareEntity = (Software) entity; // Cast seguro
+                Software softwareEntity = (Software) entity;
                 dto = SoftwareDto.builder()
                         .holderName(softwareEntity.getHolderName())
                         .holderAddress(softwareEntity.getHolderAddress())
@@ -469,10 +427,6 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     throw new IllegalStateException("Tipo de Propriedade Intelectual desconhecido ou inválido para conversão de entidade para DTO: " + entity.getType());
         }
 
-        // --- Copia os campos da classe base (IntellectualProperty) para o DTO de subclasse ---
-        // O SuperBuilder dos DTOs concretos já inclui os campos da base.
-        // É possível usar os setters se os campos não foram preenchidos pelo builder da subclasse.
-        // No entanto, como @SuperBuilder funciona aqui, a maioria já deve ter sido copiada.
         dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
         dto.setDescription(entity.getDescription());
@@ -483,9 +437,9 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         dto.setExpirationDate(entity.getExpirationDate());
         dto.setProcessingStage(entity.getProcessingStage());
         dto.setInventorId(entity.getInventor() != null ? entity.getInventor().getId() : null);
-        dto.setInventorName(entity.getInventor() != null ? entity.getInventor().getName() : null); // Assumindo Inventor tem 'getName()'
+        dto.setInventorName(entity.getInventor() != null ? entity.getInventor().getName() : null);
         dto.setStartupId(entity.getStartup() != null ? entity.getStartup().getId() : null);
-        dto.setStartupName(entity.getStartup() != null ? entity.getStartup().getName() : null); // Assumindo Startup tem 'getName()'
+        dto.setStartupName(entity.getStartup() != null ? entity.getStartup().getName() : null);
         dto.setDocuments(documentDtos);
 
         return dto;

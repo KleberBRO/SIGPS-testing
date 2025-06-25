@@ -22,22 +22,9 @@ public class IntellectualPropertyController {
     }
 
     /**
-     * Endpoint para criar uma nova Propriedade Intelectual.
-     * Recebe um DTO genérico (ou de subclasse) e o processa.
-     * POST /api/intellectual-properties*
-     * Exemplo de JSON para SoftwareDto:
-     * {
-     * "title": "Sistema de Gestão Acadêmica",
-     * "description": "Software para gerenciamento de cursos e alunos.",
-     * "type": "SOFTWARE",
-     * "status": "EM_ANALISE",
-     * "requestDate": "2023-01-15",
-     * "processingStage": "FASE_INICIAL",
-     * "inventorId": 1,
-     * "holderName": "UFRPE",
-     * "creationDate": "2022-05-01",
-     * "programmingLanguage": "Java"
-     * }
+     * Endpoint para criar uma nova Propriedade Intelectual
+     * Recebe um DTO genérico e o processa para uma subclasse
+     * POST /api/intellectual-properties
      */
     @PostMapping
     public ResponseEntity<IntellectualPropertyDto> createIntellectualProperty(@Valid @RequestBody IntellectualPropertyDto piDto) {
@@ -46,7 +33,7 @@ public class IntellectualPropertyController {
     }
 
     /**
-     * Endpoint para buscar uma Propriedade Intelectual pelo ID.
+     * Endpoint para buscar uma Propriedade Intelectual pelo ID
      * GET /api/intellectual-properties/{id}
      */
     @GetMapping("/{id}")
@@ -70,9 +57,9 @@ public class IntellectualPropertyController {
     }
 
     /**
-     * Endpoint para atualizar uma Propriedade Intelectual existente.
-     * PUT /api/intellectual-properties/{id}*
-     * O corpo da requisição deve ser um DTO completo do tipo específico (SoftwareDto, BrandDto, etc.).
+     * Endpoint para atualizar uma Propriedade Intelectual existente
+     * PUT /api/intellectual-properties/{id}
+     * O corpo da requisição deve ser um DTO completo do tipo específico (SoftwareDto, BrandDto, etc)
      */
     @PutMapping("/{id}")
     public ResponseEntity<IntellectualPropertyDto> updateIntellectualProperty(
@@ -90,14 +77,14 @@ public class IntellectualPropertyController {
     }
 
     /**
-     * Endpoint para deletar uma Propriedade Intelectual pelo ID.
+     * Endpoint para deletar uma Propriedade Intelectual pelo ID
      * DELETE /api/intellectual-properties/{id}
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIntellectualProperty(@PathVariable Long id) {
         try {
             intellectualPropertyService.deleteIntellectualProperty(id);
-            return ResponseEntity.noContent().build(); // Status 204 No Content
+            return ResponseEntity.noContent().build(); // Status: 204 No Content
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

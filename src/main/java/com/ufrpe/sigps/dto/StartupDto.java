@@ -27,7 +27,8 @@ public class StartupDto {
     private String status;
     private String academicProjectLink;
     private String researchGroupLink;
-    // Opcional: List<IntellectualPropertyDto> intellectualProperties;
-    // List<DocumentDto> documents;
-    // Cuidado com ciclos ou dados excessivos.
+    /*
+     List<IntellectualPropertyDto> intellectualProperties;
+     List<DocumentDto> documents;
+    */
 }

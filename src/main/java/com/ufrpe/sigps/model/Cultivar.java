@@ -29,7 +29,7 @@ public class Cultivar extends IntellectualProperty {
     private String commercialDenomination;
 
     @Column(nullable = false)
-    private String origin; // Cruzamento, seleção, etc.
+    private String origin;
 
     @Column(name = "distinctive_characteristics", columnDefinition = "TEXT", nullable = false)
     private String distinctiveCharacteristics;
@@ -47,5 +47,5 @@ public class Cultivar extends IntellectualProperty {
     private LocalDate creationDevelopmentDate;
 
     @Column(name = "dhe_data", columnDefinition = "TEXT")
-    private String dheData; // Dados relacionados à DHE (Distinguibilidade, Homogeneidade e Estabilidade)
+    private String dheData;
 }

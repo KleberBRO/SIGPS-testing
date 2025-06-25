@@ -22,16 +22,16 @@ public class Document {
     private String title;
 
     @Column(nullable = false)
-    private String type; // Ex: "Procuração", "Código-Fonte", "Imagem", "Caderno de Especificações"
+    private String type;
 
     @Column(nullable = false)
-    private String filePath; // Caminho ou URL para o arquivo armazenado
+    private String filePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "intellectual_property_id") // Documentos podem ser associados a PIs
+    @JoinColumn(name = "intellectual_property_id")
     private IntellectualProperty intellectualProperty;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "startup_id") // Documentos também podem ser associados a Startups
+    @JoinColumn(name = "startup_id")
     private Startup startup;
 }

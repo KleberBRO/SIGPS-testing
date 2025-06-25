@@ -20,7 +20,7 @@ import java.time.LocalDate;
 public class Software extends IntellectualProperty {
 
     @Column(name = "holder_name", nullable = false)
-    private String holderName; // Nome do titular
+    private String holderName;
 
     @Column(name = "holder_address", nullable = false)
     private String holderAddress;
@@ -29,13 +29,13 @@ public class Software extends IntellectualProperty {
     private String holderCpfCnpj;
 
     @Column(name = "authors_data", columnDefinition = "TEXT", nullable = false)
-    private String authorsData; // Dados dos autores (pode ser uma lista serializada ou um texto descritivo)
+    private String authorsData;
 
     @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate;
 
     @Column(name = "publication_date")
-    private LocalDate publicationDate; // Pode ser nulo
+    private LocalDate publicationDate;
 
     @Column(name = "programming_language", nullable = false)
     private String programmingLanguage;
@@ -53,11 +53,8 @@ public class Software extends IntellectualProperty {
     private String hashDescription;
 
     @Column(name = "authorized_derivation", nullable = false)
-    private Boolean authorizedDerivation; // Se houve derivação autorizada
+    private Boolean authorizedDerivation;
 
     @Column(name = "source_code_path", columnDefinition = "TEXT", nullable = false) // Caminho para o código-fonte
     private String sourceCodePath;
-
-    // Documentos obrigatórios (DV e procuração) podem ser links para Document, ou apenas um campo booleano de confirmação
-    // para simplificar, usaremos o relacionamento OneToMany com Document.java.
 }

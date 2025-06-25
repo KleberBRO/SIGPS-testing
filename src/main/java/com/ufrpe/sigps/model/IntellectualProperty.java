@@ -15,22 +15,22 @@ import java.util.List;
 @SuperBuilder
 @Entity
 @Table(name = "intellectual_property")
-@Inheritance(strategy = InheritanceType.JOINED) // Estratégia de herança para os tipos de PI
-@DiscriminatorColumn(name = "pi_type", discriminatorType = DiscriminatorType.STRING) // Coluna para diferenciar tipos de PI
-public abstract class IntellectualProperty { // Abstract, pois PI base não será instanciada diretamente
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "pi_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class IntellectualProperty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Identificador único da PI
+    private Long id;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT") // TEXT para descrições longas
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "pi_type", insertable = false, updatable = false) // Mapeia para a coluna do DiscriminatorColumn
+    @Column(name = "pi_type", insertable = false, updatable = false)
     private IntellectualPropertyType type;
 
     @Enumerated(EnumType.STRING)
@@ -41,24 +41,22 @@ public abstract class IntellectualProperty { // Abstract, pois PI base não ser�
     private LocalDate requestDate;
 
     @Column(name = "grant_date")
-    private LocalDate grantDate; // Pode ser nulo se ainda não concedida
+    private LocalDate grantDate;
 
     @Column(name = "expiration_date")
-    private LocalDate expirationDate; // Pode ser nulo se não aplicável ou não concedida
+    private LocalDate expirationDate;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading para o inventor
-    @JoinColumn(name = "inventor_id", nullable = false) // Coluna de chave estrangeira
-    private Inventor inventor; // Cada PI pertence a um inventor
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inventor_id", nullable = false)
+    private Inventor inventor;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading para a startup
-    @JoinColumn(name = "startup_id") // Pode ser nulo se não estiver vinculada a uma startup
-    private Startup startup; // Pode ou não estar vinculada a uma startup
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "startup_id")
+    private Startup startup;
 
     @OneToMany(mappedBy = "intellectualProperty", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Document> documents; // Documentos associados à PI
+    private List<Document> documents;
 
-    // Campo para o estágio do processo de registro (para P.I. em processamento)
-    // Este campo pode ser um enum ou uma string que represente o estágio atual.
     @Column(name = "processing_stage")
     private String processingStage;
 }

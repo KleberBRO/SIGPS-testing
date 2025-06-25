@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController // Marca a classe como um controlador REST
-@RequestMapping("/api/startups") // Define o caminho base para todos os endpoints neste controlador
+@RestController
+@RequestMapping("/api/startups")
 public class StartupController {
 
     private final StartupService startupService;
 
-    // Injeção de dependência do StartupService via construtor
     public StartupController(StartupService startupService) {
         this.startupService = startupService;
     }
@@ -25,18 +24,8 @@ public class StartupController {
     /**
      * Endpoint para criar uma nova Startup.
      * Recebe um StartupDto no corpo da requisição.
-     * POST /api/startups*
-     * Exemplo de JSON para criação:
-     * {
-     * "cnpjOrIdentifier": "11.222.333/0001-44",
-     * "name": "TechSolutions Inovadoras Ltda.",
-     * "description": "Desenvolvimento de soluções de software para otimização de processos.",
-     * "creationDate": "2022-01-20",
-     * "status": "ATIVA",
-     * "academicProjectLink": "http://projetos.ufrpe.br/techsolutions",
-     * "researchGroupLink": null
-     * }
-     */
+     * POST /api/startups
+    */
     @PostMapping
     public ResponseEntity<StartupDto> createStartup(@Valid @RequestBody StartupDto startupDto) {
         StartupDto createdStartup = startupService.createStartup(startupDto);
@@ -91,7 +80,7 @@ public class StartupController {
     public ResponseEntity<Void> deleteStartup(@PathVariable Long id) {
         try {
             startupService.deleteStartup(id);
-            return ResponseEntity.noContent().build(); // Status 204 No Content
+            return ResponseEntity.noContent().build(); // Status: 204 No Content
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

@@ -26,12 +26,10 @@ public class GeographicIndication extends IntellectualProperty {
     @Column(name = "area_delimitation", columnDefinition = "TEXT", nullable = false)
     private String areaDelimitation;
 
-    @Column(name = "ig_nature", nullable = false) // Produto ou serviço
+    @Column(name = "ig_nature", nullable = false)
     private String igNature;
 
-    @Column(name = "visual_representation_url") // Caminho para a imagem
+    @Column(name = "visual_representation_url")
     private String visualRepresentationUrl;
 
-    // Documentos como caderno de especificações, procuração, estatuto social, atas, declaração de produtores, comprovantes.
-    // Estes serão tratados como uma lista de 'Document' relacionados à PI, como já previsto na classe IntellectualProperty.
 }
