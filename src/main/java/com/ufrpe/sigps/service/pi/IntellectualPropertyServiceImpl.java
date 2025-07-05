@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,42 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                 .map(this::convertEntityToDto)
                 .orElseThrow(() -> new EntityNotFoundException("Propriedade Intelectual com ID " + id + " não encontrada."));
     }
+
+    @Override
+    public List<IntellectualPropertyDto> getIntellectualPropertyByTitle(String title) {
+        return intellectualPropertyRepository.findByTitleContainingIgnoreCase(title).stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IntellectualPropertyDto> getIntellectualPropertyByInventorName(String inventorName) {
+        return intellectualPropertyRepository.findByInventorName(inventorName).stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IntellectualPropertyDto> getIntellectualPropertyByRequestDate(LocalDate requestDate) {
+        return intellectualPropertyRepository.findByRequestDate(requestDate).stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IntellectualPropertyDto> getIntellectualPropertyByGrantDate(LocalDate grantDate) {
+        return intellectualPropertyRepository.findByGrantDate(grantDate).stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IntellectualPropertyDto> getIntellectualPropertyByExpirationDate(LocalDate expirationDate) {
+        return intellectualPropertyRepository.findByExpirationDate(expirationDate).stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public List<IntellectualPropertyDto> getAllIntellectualProperties() {

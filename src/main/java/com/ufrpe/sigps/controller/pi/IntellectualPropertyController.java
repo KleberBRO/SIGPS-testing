@@ -2,13 +2,16 @@
 package com.ufrpe.sigps.controller.pi;
 
 import com.ufrpe.sigps.dto.IntellectualPropertyDto;
+import com.ufrpe.sigps.model.Inventor;
 import com.ufrpe.sigps.service.pi.IntellectualPropertyService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,6 +48,87 @@ public class IntellectualPropertyController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    /**
+     * Busca PIs pelo título.
+     * Exemplo: GET /api/intellectual-properties/title?value=Vinho do Vale
+     */
+    @GetMapping("/title")
+    public ResponseEntity<List<IntellectualPropertyDto>> getIntellectualPropertyByTitle
+    (@RequestParam ("value") String title) {
+        try {
+            List<IntellectualPropertyDto> pis = intellectualPropertyService.getIntellectualPropertyByTitle(title);
+            return ResponseEntity.ok(pis);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    /**
+     * Busca PIs pelo nome do inventor
+     * Exemplo: GET /api/intellectual-properties/inventor?value=Alvaro2
+     */
+    @GetMapping("/inventor")
+    public ResponseEntity<List<IntellectualPropertyDto>> getIntellectualPropertyByInventor
+    (@RequestParam ("value") String inventorName) {
+        try {
+            List<IntellectualPropertyDto> pis = intellectualPropertyService.getIntellectualPropertyByInventorName(inventorName);
+            return ResponseEntity.ok(pis);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    /**
+     * Busca PIs pela data de requisição (formato YYYY-MM-DD).
+     * Exemplo: GET /api/intellectual-properties/request-date?date=2024-01-15
+     */
+    @GetMapping("/request-date")
+    public ResponseEntity<List<IntellectualPropertyDto>> getIntellectualPropertyByRequestDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            List<IntellectualPropertyDto> pis = intellectualPropertyService.getIntellectualPropertyByRequestDate(date);
+            return ResponseEntity.ok(pis);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+
+    /**
+     * Busca PIs pela data de concessão (formato YYYY-MM-DD).
+     * Exemplo: GET /api/intellectual-properties/grant-date?date=2024-01-15
+     */
+    @GetMapping("/grant-date")
+    public ResponseEntity<List<IntellectualPropertyDto>> getIntellectualPropertyByGrantDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            List<IntellectualPropertyDto> pis = intellectualPropertyService.getIntellectualPropertyByGrantDate(date);
+            return ResponseEntity.ok(pis);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+
+    /**
+     * Busca PIs pela data de vencimento (formato YYYY-MM-DD).
+     * Exemplo: GET /api/intellectual-properties/expiration-date?date=2024-01-15
+     */
+    @GetMapping("/expiration-date")
+    public ResponseEntity<List<IntellectualPropertyDto>> getIntellectualPropertyByExpirationDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            List<IntellectualPropertyDto> pis = intellectualPropertyService.getIntellectualPropertyByExpirationDate(date);
+            return ResponseEntity.ok(pis);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
 
     /**
      * Endpoint para listar todas as Propriedades Intelectuais.

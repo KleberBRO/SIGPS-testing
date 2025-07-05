@@ -22,7 +22,18 @@ public interface IntellectualPropertyRepository extends JpaRepository<Intellectu
 
     List<IntellectualProperty> findByTitleContainingIgnoreCase(String title);
 
+    List<IntellectualProperty> findByInventorName(String name);
+
+    List<IntellectualProperty> findByRequestDate(LocalDate requestDate);
+
+    List<IntellectualProperty> findByGrantDate(LocalDate grantDate);
+
+    List<IntellectualProperty> findByExpirationDate(LocalDate expirationDate);
 
     List<IntellectualProperty> findByRequestDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<IntellectualProperty> findByGrantDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<IntellectualProperty> findByExpirationDateBetween(LocalDate startDate, LocalDate endDate);
 
 }
