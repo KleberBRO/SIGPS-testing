@@ -55,7 +55,7 @@ public abstract class IntellectualProperty {
     private Startup startup;
 
     @OneToMany(mappedBy = "intellectualProperty", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Document> documents;
+    private List<FileApp> files;
 
     @Column(name = "processing_stage")
     private String processingStage;

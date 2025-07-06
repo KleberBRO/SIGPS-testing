@@ -2,11 +2,13 @@
 package com.ufrpe.sigps.service.pi;
 
 import com.ufrpe.sigps.dto.IntellectualPropertyDto; // Importe o seu DTO
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.time.LocalDate;
 
 public interface IntellectualPropertyService {
 
+    IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto, List<MultipartFile> documentFiles, List<MultipartFile> imageFiles);
     IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto);
     IntellectualPropertyDto getIntellectualPropertyById(Long id);
     List<IntellectualPropertyDto> getIntellectualPropertyByTitle(String title);

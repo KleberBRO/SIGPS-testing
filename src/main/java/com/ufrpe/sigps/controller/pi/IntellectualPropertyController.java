@@ -1,15 +1,21 @@
 // src/main/java/com/ufrpe/sigps/controller/pi/IntellectualPropertyController.java
 package com.ufrpe.sigps.controller.pi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ufrpe.sigps.dto.IntellectualPropertyDto;
 import com.ufrpe.sigps.model.Inventor;
 import com.ufrpe.sigps.service.pi.IntellectualPropertyService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +24,9 @@ import java.util.List;
 @RequestMapping("/api/intellectual-properties")
 public class IntellectualPropertyController {
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private final IntellectualPropertyService intellectualPropertyService;
 
     public IntellectualPropertyController(IntellectualPropertyService intellectualPropertyService) {
@@ -25,13 +34,24 @@ public class IntellectualPropertyController {
     }
 
     /**
-     * Endpoint para criar uma nova Propriedade Intelectual
-     * Recebe um DTO genérico e o processa para uma subclasse
+     * Endpoint para criar uma nova Propriedade Intelectual com upload de arquivo.
+     * Recebe um DTO e um arquivo via multipart/form-data
      * POST /api/intellectual-properties
      */
-    @PostMapping
-    public ResponseEntity<IntellectualPropertyDto> createIntellectualProperty(@Valid @RequestBody IntellectualPropertyDto piDto) {
-        IntellectualPropertyDto createdPI = intellectualPropertyService.createIntellectualProperty(piDto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createIntellectualProperty(
+            @RequestPart("piData") String piDataJson,
+            // Recebe uma lista de arquivos para a chave "documents"
+            @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles,
+            // Recebe uma lista de arquivos para a chave "images"
+            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles
+    ) throws JsonProcessingException {
+
+        IntellectualPropertyDto piDto = objectMapper.readValue(piDataJson, IntellectualPropertyDto.class);
+
+        // Chama o novo método do serviço que aceita as listas de arquivos
+        IntellectualPropertyDto createdPI = intellectualPropertyService.createIntellectualProperty(piDto, documentFiles, imageFiles);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPI);
     }
 

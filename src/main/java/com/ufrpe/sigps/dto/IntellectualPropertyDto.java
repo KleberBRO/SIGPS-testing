@@ -44,5 +44,5 @@ public abstract class IntellectualPropertyDto {
     private Long startupId;
     private String startupName;
     private String processingStage;
-    private List<DocumentDto> documents;
+    private List<FileDto> files;
 }

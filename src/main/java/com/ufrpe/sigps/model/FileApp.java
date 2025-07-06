@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "document")
-public class Document {
+@Table(name = "file")
+public class FileApp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

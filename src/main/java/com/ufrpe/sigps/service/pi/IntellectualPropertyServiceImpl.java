@@ -3,6 +3,8 @@ package com.ufrpe.sigps.service.pi;
 
 import com.ufrpe.sigps.dto.*; // Importa todos os DTOs do pacote dto
 import com.ufrpe.sigps.model.*; // Importa todas as entidades do pacote model
+import com.ufrpe.sigps.service.FileStorageService; // Importe o novo serviço
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ufrpe.sigps.repository.IntellectualPropertyRepository;
 import com.ufrpe.sigps.repository.InventorRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,16 +26,60 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
     private final IntellectualPropertyRepository intellectualPropertyRepository;
     private final InventorRepository inventorRepository;
     private final StartupRepository startupRepository;
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public IntellectualPropertyServiceImpl(
             IntellectualPropertyRepository intellectualPropertyRepository,
             InventorRepository inventorRepository,
-            StartupRepository startupRepository) {
+            StartupRepository startupRepository,FileStorageService fileStorageService) {
         this.intellectualPropertyRepository = intellectualPropertyRepository;
         this.inventorRepository = inventorRepository;
         this.startupRepository = startupRepository;
+        this.fileStorageService = fileStorageService;
     }
+
+    /**
+     * Método que processa listas de documentos e imagens.
+     */
+    @Override
+    public IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto, List<MultipartFile> documentFiles, List<MultipartFile> imageFiles) {
+
+        // Inicializa a lista de documentos no DTO se for nula
+        if (piDto.getFiles() == null) {
+            piDto.setFiles(new ArrayList<>());
+        }
+
+        // 1. Processa a lista de DOCUMENTOS (PDFs)
+        if (documentFiles != null && !documentFiles.isEmpty()) {
+            for (MultipartFile file : documentFiles) {
+                String fileName = fileStorageService.storeFile(file); // Salva o arquivo
+
+                FileDto documentInfo = new FileDto();
+                documentInfo.setTitle(file.getOriginalFilename());
+                documentInfo.setFilePath(fileName);
+                documentInfo.setType("DOCUMENTO"); // Define o tipo para diferenciar
+
+                piDto.getFiles().add(documentInfo);
+            }
+        }
+        // 2. Processa a lista de IMAGENS
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            for (MultipartFile file : imageFiles) {
+                String fileName = fileStorageService.storeFile(file); // Salva o arquivo
+
+                FileDto imageInfo = new FileDto();
+                imageInfo.setTitle(file.getOriginalFilename());
+                imageInfo.setFilePath(fileName);
+                imageInfo.setType("IMAGEM"); // Define o tipo para diferenciar
+
+                piDto.getFiles().add(imageInfo);
+            }
+        }
+        // 3. Chama o método de criação original que já sabe como lidar com o DTO
+        return createIntellectualProperty(piDto);
+    }
+
 
     @Override
     public IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto) {
@@ -240,10 +287,10 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     .orElseThrow(() -> new EntityNotFoundException("Startup com ID " + dto.getStartupId() + " não encontrada."));
         }
 
-        List<Document> documents = null;
-        if (dto.getDocuments() != null && !dto.getDocuments().isEmpty()) {
-            documents = dto.getDocuments().stream()
-                    .map(docDto -> Document.builder()
+        List<FileApp> files = null;
+        if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
+            files = dto.getFiles().stream()
+                    .map(docDto -> FileApp.builder()
                             .id(docDto.getId())
                             .title(docDto.getTitle())
                             .type(docDto.getType())
@@ -355,21 +402,21 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         intellectualProperty.setInventor(inventor);
         intellectualProperty.setStartup(startup);
 
-        if (documents != null) {
-            for (Document doc : documents) {
+        if (files != null) {
+            for (FileApp doc : files) {
                 doc.setIntellectualProperty(intellectualProperty);
             }
         }
-        intellectualProperty.setDocuments(documents);
+        intellectualProperty.setFiles(files);
 
         return intellectualProperty;
     }
 
     private IntellectualPropertyDto convertEntityToDto(IntellectualProperty entity) {
-        List<DocumentDto> documentDtos = null;
-        if (entity.getDocuments() != null && !entity.getDocuments().isEmpty()) {
-            documentDtos = entity.getDocuments().stream()
-                    .map(docEntity -> DocumentDto.builder()
+        List<FileDto> fileDtos = null;
+        if (entity.getFiles() != null && !entity.getFiles().isEmpty()) {
+            fileDtos = entity.getFiles().stream()
+                    .map(docEntity -> FileDto.builder()
                             .id(docEntity.getId())
                             .title(docEntity.getTitle())
                             .type(docEntity.getType())
@@ -477,7 +524,7 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         dto.setInventorName(entity.getInventor() != null ? entity.getInventor().getName() : null);
         dto.setStartupId(entity.getStartup() != null ? entity.getStartup().getId() : null);
         dto.setStartupName(entity.getStartup() != null ? entity.getStartup().getName() : null);
-        dto.setDocuments(documentDtos);
+        dto.setFiles(fileDtos);
 
         return dto;
     }

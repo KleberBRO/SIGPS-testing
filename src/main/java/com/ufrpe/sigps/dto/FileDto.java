@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentDto {
+public class FileDto {
     private Long id;
     @NotBlank(message = "Título do documento é obrigatório")
     private String title;
