@@ -3,8 +3,8 @@ package com.ufrpe.sigps.service.pi;
 
 import com.ufrpe.sigps.dto.*; // Importa todos os DTOs do pacote dto
 import com.ufrpe.sigps.model.*; // Importa todas as entidades do pacote model
-import com.ufrpe.sigps.service.FileStorageService; // Importe o novo serviço
 import org.springframework.web.multipart.MultipartFile;
+import com.ufrpe.sigps.service.S3StorageService;
 
 import com.ufrpe.sigps.repository.IntellectualPropertyRepository;
 import com.ufrpe.sigps.repository.InventorRepository;
@@ -26,58 +26,51 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
     private final IntellectualPropertyRepository intellectualPropertyRepository;
     private final InventorRepository inventorRepository;
     private final StartupRepository startupRepository;
-    private final FileStorageService fileStorageService;
+    private final S3StorageService s3StorageService;
 
     @Autowired
     public IntellectualPropertyServiceImpl(
             IntellectualPropertyRepository intellectualPropertyRepository,
             InventorRepository inventorRepository,
-            StartupRepository startupRepository,FileStorageService fileStorageService) {
-        this.intellectualPropertyRepository = intellectualPropertyRepository;
-        this.inventorRepository = inventorRepository;
-        this.startupRepository = startupRepository;
-        this.fileStorageService = fileStorageService;
+            StartupRepository startupRepository,
+            S3StorageService s3StorageService) {
+            this.intellectualPropertyRepository = intellectualPropertyRepository;
+            this.inventorRepository = inventorRepository;
+            this.startupRepository = startupRepository;
+            this.s3StorageService = s3StorageService;
     }
 
-    /**
-     * Método que processa listas de documentos e imagens.
-     */
     @Override
     public IntellectualPropertyDto createIntellectualProperty(IntellectualPropertyDto piDto, List<MultipartFile> documentFiles, List<MultipartFile> imageFiles) {
-
-        // Inicializa a lista de documentos no DTO se for nula
         if (piDto.getFiles() == null) {
             piDto.setFiles(new ArrayList<>());
         }
 
-        // 1. Processa a lista de DOCUMENTOS (PDFs)
+        // Processa documentos
         if (documentFiles != null && !documentFiles.isEmpty()) {
             for (MultipartFile file : documentFiles) {
-                String fileName = fileStorageService.storeFile(file); // Salva o arquivo
-
-                FileDto documentInfo = new FileDto();
-                documentInfo.setTitle(file.getOriginalFilename());
-                documentInfo.setFilePath(fileName);
-                documentInfo.setType("DOCUMENTO"); // Define o tipo para diferenciar
-
-                piDto.getFiles().add(documentInfo);
+                String fileUrl = s3StorageService.uploadFile(file); // Faz upload para S3
+                FileDto fileInfo = new FileDto();
+                fileInfo.setTitle(file.getOriginalFilename());
+                fileInfo.setFilePath(fileUrl); // Salva a URL completa do S3
+                fileInfo.setType("DOCUMENTO");
+                piDto.getFiles().add(fileInfo);
             }
         }
-        // 2. Processa a lista de IMAGENS
+
+        // Processa imagens
         if (imageFiles != null && !imageFiles.isEmpty()) {
             for (MultipartFile file : imageFiles) {
-                String fileName = fileStorageService.storeFile(file); // Salva o arquivo
-
+                String fileUrl = s3StorageService.uploadFile(file); // Faz upload para S3
                 FileDto imageInfo = new FileDto();
                 imageInfo.setTitle(file.getOriginalFilename());
-                imageInfo.setFilePath(fileName);
-                imageInfo.setType("IMAGEM"); // Define o tipo para diferenciar
-
+                imageInfo.setFilePath(fileUrl); // Salva a URL completa do S3
+                imageInfo.setType("IMAGEM");
                 piDto.getFiles().add(imageInfo);
             }
         }
-        // 3. Chama o método de criação original que já sabe como lidar com o DTO
-        return createIntellectualProperty(piDto);
+
+        return createIntellectualProperty(piDto); // Chama o método original
     }
 
 
