@@ -280,10 +280,10 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                     .orElseThrow(() -> new EntityNotFoundException("Startup com ID " + dto.getStartupId() + " não encontrada."));
         }
 
-        List<FileApp> files = null;
+        List<FilePi> files = null;
         if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
             files = dto.getFiles().stream()
-                    .map(docDto -> FileApp.builder()
+                    .map(docDto -> FilePi.builder()
                             .id(docDto.getId())
                             .title(docDto.getTitle())
                             .type(docDto.getType())
@@ -396,7 +396,7 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
         intellectualProperty.setStartup(startup);
 
         if (files != null) {
-            for (FileApp doc : files) {
+            for (FilePi doc : files) {
                 doc.setIntellectualProperty(intellectualProperty);
             }
         }

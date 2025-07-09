@@ -46,5 +46,5 @@ public class Startup {
     private List<IntellectualProperty> intellectualProperties;
 
     @OneToMany(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FileApp> files;
+    private List<FileStartup> files;
 }

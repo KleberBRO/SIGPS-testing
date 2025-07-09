@@ -27,8 +27,7 @@ public class StartupDto {
     private String status;
     private String academicProjectLink;
     private String researchGroupLink;
-    /*
-     List<IntellectualPropertyDto> intellectualProperties;
-     List<DocumentDto> documents;
-    */
+     private List<IntellectualPropertyDto> intellectualProperties;
+     private List<FileDto> files;
+
 }
