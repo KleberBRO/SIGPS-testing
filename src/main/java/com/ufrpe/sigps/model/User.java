@@ -6,14 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-// IMPORTS DO SPRING SECURITY (ADICIONE ESTES)
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails; // ESTE É O MAIS IMPORTANTE!
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.List;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List; // Importar List para o método getAuthorities()
+
 
 @Data
 @NoArgsConstructor

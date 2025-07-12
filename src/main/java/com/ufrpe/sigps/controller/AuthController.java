@@ -1,12 +1,14 @@
+// src/main/java/com/ufrpe/sigps/controller/AuthController.java
 package com.ufrpe.sigps.controller;
 
-import com.ufrpe.sigps.dto.AuthResponse;
-import com.ufrpe.sigps.dto.LoginRequest;
-import com.ufrpe.sigps.dto.RegisterRequest;
-import com.ufrpe.sigps.service.AuthService;
-import jakarta.validation.Valid;
+// --- INÍCIO DAS IMPORTAÇÕES CORRIGIDAS ---
+import com.ufrpe.sigps.dto.auth.AuthRequest;
+import com.ufrpe.sigps.dto.auth.AuthResponse;
+import com.ufrpe.sigps.dto.auth.RegisterRequest;
+// --- FIM DAS IMPORTAÇÕES CORRIGIDAS ---
+
+import com.ufrpe.sigps.service.security.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,30 +16,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
 
-    /**
-     * Endpoint para registrar um novo usuário.
-     * Recebe os dados do usuário no corpo da requisição e retorna um token JWT.
-     */
+    private final AuthService service;
+
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
-            @RequestBody @Valid RegisterRequest request
+            @RequestBody RegisterRequest request // Agora usa a classe do pacote "auth"
     ) {
-        return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
+        // O `service.register` espera um RegisterRequest do pacote "auth",
+        // e agora o controller está passando o tipo correto.
+        return ResponseEntity.ok(service.register(request));
     }
 
-    /**
-     * Endpoint para autenticar um usuário existente.
-     * Recebe e-mail e senha e retorna um token JWT válido.
-     */
     @PostMapping("/authenticate")
     public ResponseEntity<AuthResponse> authenticate(
-            @RequestBody LoginRequest request
+            @RequestBody AuthRequest request // Agora usa a classe do pacote "auth"
     ) {
-        return ResponseEntity.ok(authService.authenticate(request));
+        // O mesmo se aplica aqui para o AuthRequest e AuthResponse.
+        return ResponseEntity.ok(service.authenticate(request));
     }
+
 }
