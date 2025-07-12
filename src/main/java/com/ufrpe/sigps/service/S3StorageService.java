@@ -7,10 +7,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -36,20 +37,43 @@ public class S3StorageService {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         String uniqueFileName = UUID.randomUUID().toString() + "_" + originalFileName;
 
-        try {
+        try (InputStream inputStream = file.getInputStream()) {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(uniqueFileName)
                     .contentType(file.getContentType())
                     .build();
 
-            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            // Usa o inputStream que será fechado automaticamente
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, file.getSize()));
 
             // Constrói e retorna a URL pública do objeto
             return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, awsRegion, uniqueFileName);
 
         } catch (IOException e) {
             throw new RuntimeException("Falha ao fazer upload do arquivo para o S3", e);
+        }
+    }
+
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) {
+            return;
+        }
+        try {
+            // Extrai a chave do arquivo da URL completa
+            String fileKey = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileKey)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+            System.out.println("Arquivo deletado com sucesso do S3: " + fileKey);
+        } catch (Exception e) {
+            // Loga a exceção mas não impede o fluxo principal de tratamento de erro
+            System.err.println("Erro ao deletar arquivo do S3: " + fileUrl);
+            e.printStackTrace();
         }
     }
 }

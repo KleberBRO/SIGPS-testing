@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,5 +30,11 @@ public class StartupDto {
     private String researchGroupLink;
      private List<IntellectualPropertyDto> intellectualProperties;
      private List<FileDto> files;
+     public void addFile(FileDto file) {
+        if (this.files == null) {
+            this.files = new ArrayList<>();
+        }
+        this.files.add(file);
+    }
 
 }

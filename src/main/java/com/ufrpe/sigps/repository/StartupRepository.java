@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.List;
 
 public interface StartupRepository extends JpaRepository<Startup, Long> {
+
+    boolean existsByCnpj(String cnpj);
     Optional<Startup> findByCnpj(String cnpj);
     List<Startup> findByNameContainingIgnoreCase(String name);
     List<Startup> findByStatus(String status);
