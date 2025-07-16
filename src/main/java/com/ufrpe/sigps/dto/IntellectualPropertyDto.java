@@ -1,5 +1,6 @@
 package com.ufrpe.sigps.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.ufrpe.sigps.model.IntellectualPropertyStatus;
@@ -45,4 +46,25 @@ public abstract class IntellectualPropertyDto {
     private String startupName;
     private String processingStage;
     private List<FileDto> files;
+    
+    // Métodos auxiliares para verificar se inventor e startup são válidos
+    @JsonIgnore
+    public boolean hasValidInventorId() {
+        return inventorId != null && inventorId > 0;
+    }
+    
+    @JsonIgnore
+    public boolean hasValidStartupId() {
+        return startupId != null && startupId > 0;
+    }
+    
+    @JsonIgnore
+    public boolean hasInventorName() {
+        return inventorName != null && !inventorName.trim().isEmpty();
+    }
+    
+    @JsonIgnore
+    public boolean hasStartupName() {
+        return startupName != null && !startupName.trim().isEmpty();
+    }
 }

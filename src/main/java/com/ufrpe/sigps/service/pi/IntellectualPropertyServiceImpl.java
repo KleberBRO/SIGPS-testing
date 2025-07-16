@@ -237,29 +237,26 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
                         }
                     }
 
-
-                    if (piDto.getInventorId() != null) {
+                    if (piDto.hasValidInventorId()) { // Use o método helper
                         Inventor inventor = inventorRepository.findById(piDto.getInventorId())
                                 .orElseThrow(() -> new EntityNotFoundException("Inventor com ID " + piDto.getInventorId() + " não encontrado."));
                         existingPI.setInventor(inventor);
                     } else {
-
-                        throw new IllegalArgumentException("O inventor é obrigatório para Propriedade Intelectual.");
+                        existingPI.setInventor(null); // Permite inventor nulo
                     }
 
-                    if (piDto.getStartupId() != null) {
+                    if (piDto.hasValidStartupId()) { // Use o método helper
                         Startup startup = startupRepository.findById(piDto.getStartupId())
                                 .orElseThrow(() -> new EntityNotFoundException("Startup com ID " + piDto.getStartupId() + " não encontrada."));
                         existingPI.setStartup(startup);
                     } else {
                         existingPI.setStartup(null);
                     }
-
-                    IntellectualProperty updatedPI = intellectualPropertyRepository.save(existingPI);
-                    return convertEntityToDto(updatedPI);
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Propriedade Intelectual com ID " + id + " não encontrada para atualização."));
-    }
+                                        IntellectualProperty updatedPI = intellectualPropertyRepository.save(existingPI);
+                                        return convertEntityToDto(updatedPI);
+                                    })
+                                    .orElseThrow(() -> new EntityNotFoundException("Propriedade Intelectual com ID " + id + " não encontrada para atualização."));
+                    }
 
     @Override
     public void deleteIntellectualProperty(Long id) {
@@ -271,8 +268,11 @@ public class IntellectualPropertyServiceImpl implements IntellectualPropertyServ
 
     private IntellectualProperty convertDtoToEntity(IntellectualPropertyDto dto) {
 
-        Inventor inventor = inventorRepository.findById(dto.getInventorId())
-                .orElseThrow(() -> new EntityNotFoundException("Inventor com ID " + dto.getInventorId() + " não encontrado."));
+        Inventor inventor = null;
+        if (dto.getInventorId() != null) {
+            inventor = inventorRepository.findById(dto.getInventorId())
+                    .orElseThrow(() -> new EntityNotFoundException("Inventor com ID " + dto.getInventorId() + " não encontrado."));
+        }
 
         Startup startup = null;
         if (dto.getStartupId() != null) {

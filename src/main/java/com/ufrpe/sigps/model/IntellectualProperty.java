@@ -47,7 +47,7 @@ public abstract class IntellectualProperty {
     private LocalDate expirationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inventor_id", nullable = false)
+    @JoinColumn(name = "inventor_id", nullable = true) // Mudança: de nullable = false para nullable = true
     private Inventor inventor;
 
     @ManyToOne(fetch = FetchType.LAZY)

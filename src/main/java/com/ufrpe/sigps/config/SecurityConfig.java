@@ -19,46 +19,48 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-    @Configuration
-    @EnableWebSecurity
-    @RequiredArgsConstructor
-    public class SecurityConfig {
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
 
-        private final JwtAuthFilter jwtAuthFilter;
-        private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- ADICIONE ESTA LINHA para habilitar o CORS do Spring Security
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(req ->
-                            req.requestMatchers("/api/auth/**").permitAll()
-                                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.GET, "/api/intellectual-properties/**", "/api/startups/**").hasAnyRole("ADMIN", "INVENTOR")
-                                    .requestMatchers("/api/intellectual-properties/**", "/api/startups/**").hasRole("ADMIN")
-                                    .requestMatchers("/api/reports/**").hasRole("ADMIN")
-                                    .anyRequest().authenticated()
-                    )
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authenticationProvider(authenticationProvider)
-                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req ->
+                        req
+                                // Swagger endpoints - devem vir ANTES dos outros
+                                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/public/**").permitAll()
+                                .requestMatchers("/api/v1/users/me").authenticated()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/intellectual-properties/**", "/api/startups/**").hasAnyRole("ADMIN", "INVENTOR")
+                                .requestMatchers("/api/intellectual-properties/**", "/api/startups/**").hasAnyRole("ADMIN", "INVENTOR")
+                                .requestMatchers("/api/reports/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-            return http.build();
-        }
+        return http.build();
+    }
 
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-            CorsConfiguration configuration = new CorsConfiguration();
-            // Em produção, trocar "*" pelo domínio do seu front-end (ex: "http://localhost:3000")
-            configuration.setAllowedOrigins(List.of("*"));
-            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-            configuration.setAllowedHeaders(List.of("*"));
-            // configuration.setAllowCredentials(true); // Descomentar se precisar de cookies/sessão
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
 
-            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            source.registerCorsConfiguration("/api/**", configuration); // Aplica a configuração a todos os endpoints /api/**
-            return source;
-        }
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration);
+        return source;
+    }
 }
