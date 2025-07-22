@@ -8,6 +8,9 @@ import com.ufrpe.sigps.model.Role;
 import com.ufrpe.sigps.model.Inventor;
 import com.ufrpe.sigps.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,8 +71,18 @@ public class AuthService {
                         request.getPassword()
                 )
         );
+        
         var user = repository.findByEmail(request.getEmail()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
+        
+        // Adicionar informações extras ao token
+        var extraClaims = new HashMap<String, Object>();
+        extraClaims.put("roles", user.getAuthorities().stream()
+                .map(authority -> authority.getAuthority())
+                .toList());
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("name", user.getName());
+        
+        var jwtToken = jwtService.generateToken(extraClaims, user);
         return AuthResponse.builder().token(jwtToken).build();
     }
 }
